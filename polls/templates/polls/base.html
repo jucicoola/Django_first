@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name = "viewport" content ="width=device-width, initial-scale = 1.0">
+    <title>{% block title %}Polls{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'polls/index.css' %}">
+</head>
+<body>
+    {% include "polls/header.html" %}
+    
+    <main>
+        {% block content %}
+        <!--이부분은 개별 html 파일에서 채워짐
+       
+        이렇게 지정된 것이 들어가며 페이지별로 추가로 설정은 이 밖에다가 한다. 
+        그리고 안에 내용을 어떻게 할 것인지 채워넣으면 된다.
+        -->
+         {% endblock %}
+    </main>
+    
+    {% include "polls/footer.html" %}
+
+</body>
+</html>

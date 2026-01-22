@@ -1,0 +1,33 @@
+<!-- {{두번 써야지 출력이 됨 아니면 진짜 문자 그대로 출력됨  -->
+ <!-- {{을 쓰면 안에 있는 결과물이 출력됨, {}을 쓰면 문자 그대로 {}을 출력함  -->
+{% extends "polls/base.html" %}
+{% load static %}
+
+{% block title %}{{ question.question_text }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'polls/detail.css' %}">
+
+<div class="detail-container">
+ <h2 class="question-title">{{ question.question_text }}</h2>
+
+ <form action="{% url 'polls:vote' question.id %}" method="post" class="vote-form">
+  {% csrf_token %}
+	{% if error_message %}
+    <p class="error-message"><strong>{{ error_message }}</strong></p>
+	{% endif %}
+
+   <ul class="choice-list">
+    {% for choice in question.choice_set.all %}
+    <li>
+      <input type="radio" name="choice" id="choice_{{ choice.id }}" value="{{ choice.id }}">
+      <label for="choice_{{ choice.id }}">{{ choice.choice_text }}</label>
+    </li>
+    {% endfor %}
+   </ul>
+  <div class="submit-btn-wrap">
+   <input type="submit" value="Vote" class="submit-btn">
+  </div>
+ </form>
+</div>
+{% endblock %}
