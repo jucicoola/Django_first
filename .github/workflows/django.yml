@@ -28,4 +28,6 @@ jobs:
         pip install -r requirements.txt
     - name: Run Tests
       run: |
-        python manage.py test
+        python manage.py makemigrations  # 모델 변경사항 확인
+        python manage.py migrate         # 테스트용 테이블 생성
+        python manage.py test            # 실제 테스트 실행
