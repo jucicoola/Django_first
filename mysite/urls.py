@@ -7,4 +7,6 @@ urlpatterns = [
     #polls/에서 이름을 바꾸면 그냥 내가 그렇게 부르겠다는 얘기임
     path("polls/", include("polls.urls")), # polls 앱의 URL 연결
     path('admin/', admin.site.urls),
+    path("accounts/", include("accounts.urls")),
+    path("accounts/", include("django.contrib.auth.urls"))
 ]
