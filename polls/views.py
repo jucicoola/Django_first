@@ -1,3 +1,4 @@
+import datetime
 from django.db.models import F
 from django.urls import reverse
 from django.views import generic
@@ -7,14 +8,47 @@ from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from django.urls import reverse_lazy
 
-#index는 최신글 리스트임 -pub_date는 내림차순(날짜 최신순)/ pub_date는 오름차순
-# 메인 페이지 (질문 목록)
+def parse_yyyy_mm_dd(value: str):
+    try:
+        return datetime.date.fromisoformat(value)
+    except(TypeError,ValueError):
+        None
+
 class IndexView(generic.ListView):
     template_name = "polls/index.html"
     context_object_name = "latest_question_list"
 
     def get_queryset(self):
-        return Question.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[:5]
+        qs = Question.objects.all()
+
+        # 1) show=future → 미래 질문 포함 여부 (기본: 미래 숨김)
+        show = self.request.GET.get("show")
+        if show != "future":
+            qs = qs.filter(pub_date__lte=timezone.now())
+
+        # 2) q=키워드 → question_text 검색
+        q = (self.request.GET.get("q") or "").strip()
+        if q:
+            qs = qs.filter(question_text__icontains=q)
+
+        # 3) start/end=YYYY-MM-DD → 기간 필터
+        start = parse_yyyy_mm_dd(self.request.GET.get("start"))
+        end = parse_yyyy_mm_dd(self.request.GET.get("end"))
+
+        if start:
+            qs = qs.filter(pub_date__date__gte=start)
+        if end:
+            qs = qs.filter(pub_date__date__lte=end)
+
+        # 4) order=oldest → 정렬 (기본: 최신순)
+        order = self.request.GET.get("order")
+        if order == "oldest":
+            qs = qs.order_by("pub_date")
+        else:
+            qs = qs.order_by("-pub_date")
+
+        # 5) (옵션) 목록 5개 제한 유지
+        return qs[:5]    
     
 # 질문 상세 페이지
 class DetailView(generic.DetailView):
@@ -66,3 +100,5 @@ class QuestionDeleteView(generic.DeleteView):
     model =Question
     template_name = "polls/question_confirm_delete.html"
     success_url = reverse_lazy("polls:index")
+
+
